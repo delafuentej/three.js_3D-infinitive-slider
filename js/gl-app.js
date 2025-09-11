@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+
 import gsap from "gsap";
 
 import overlayVertexShader from "/shaders/overlay/vertex.glsl";
 import overlayFragmentShader from "/shaders/overlay/fragment.glsl";
 
-import exrPath from "/environmentMap/NightSkyHDRI004_8K-HDR.exr?url";
+//import exrPath from "/environmentMap/NightSkyHDRI004_8K-HDR.exr?url";
 
 import Models from "./Models";
 
@@ -106,22 +108,16 @@ export default class GLApp {
       .querySelectorAll(".prev, .next")
       .forEach((btn) => (btn.style.display = "none"));
     /*----------------------------------------------*/
-    //   Load EXR                                   */
+    //   Load HDR                              */
     /*----------------------------------------------*/
     this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     this.pmremGenerator.compileEquirectangularShader();
 
-    const exrLoader = new EXRLoader(this.loadingManager);
+    const hdrPath = "/environmentMap/NightSkyHDRI004_8K-HDR.hdr";
 
-    fetch(exrPath)
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => exrLoader.parse(buffer))
-      .then((envMap) => {
-        envMap.mapping = THREE.EquirectangularReflectionMapping;
-        scene.background = envMap;
-        scene.environment = envMap;
-      });
-    exrLoader.load(exrPath, (environmentMap) => {
+    const hdrLoader = new RGBELoader(this.loadingManager);
+
+    hdrLoader.load(hdrPath, (environmentMap) => {
       environmentMap.mapping = THREE.EquirectangularReflectionMapping;
       this.scene.background = environmentMap;
       this.scene.environment = environmentMap;
