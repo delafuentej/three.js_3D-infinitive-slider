@@ -30,7 +30,7 @@ export default class GLApp {
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.toneMapping = THREE.CineonToneMapping;
     this.renderer.toneMappingExposure = 1.0;
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     /*----------------------------------------------*/
     //   Scene & Camera                             */
