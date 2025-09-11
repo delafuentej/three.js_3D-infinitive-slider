@@ -85,7 +85,7 @@ img {
   width: 100px;
   border-radius: 50%; /* círculo perfecto */
   object-fit: cover; /* recorta para que no se deforme */
-  boder: 1px whitesmoke;
+  border: 1px whitesmoke;
 }
 .control {
   position: fixed;
