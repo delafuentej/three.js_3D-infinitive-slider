@@ -3,6 +3,7 @@ import gsap from "gsap";
 
 export default class Models {
   constructor(gl_app) {
+    this.gl_app = gl_app;
     this.scene = gl_app.scene;
     this.is_ready = false;
     this.group = new THREE.Group();
@@ -79,6 +80,8 @@ export default class Models {
 
     this.is_animating = false;
     this.bindEvents();
+    this.is_ready = true;
+    this.gl_app.checkIfReady();
   }
 
   moveBackward() {
@@ -144,17 +147,18 @@ export default class Models {
   loadTexture(src) {
     // console.log(src);
     return new Promise((resolve, reject) => {
-      const loader = new THREE.TextureLoader();
+      const loader = new THREE.TextureLoader(this.gl_app.loadingManager);
       loader.load(src, (texture) => {
         texture.colorSpace = THREE.SRGBColorSpace;
         this.textures.push(texture);
         console.log("texture", texture);
-        resolve(texture);
 
         if (this.textures.length === this.imgs.length) {
           this.is_ready = true;
           this.createMeshes();
+          this.gl_app.checkIfReady();
         }
+        resolve(texture);
       });
     });
   }

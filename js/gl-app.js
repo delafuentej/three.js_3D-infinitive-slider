@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import overlayVertexShader from "/shaders/overlay/vertex.glsl";
+import overlayFragmentShader from "/shaders/overlay/fragment.glsl";
+import gsap from "gsap";
 
 import Models from "./Models";
 
@@ -15,13 +18,13 @@ export default class GLApp {
     this.pixelRatio = Math.min(window.devicePixelRatio, 2);
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      alias: true,
+      antialias: true,
       alpha: true,
     });
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(this.pixelRatio);
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMapping = THREE.CineonToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -38,18 +41,74 @@ export default class GLApp {
     this.camera.position.z = 6;
 
     /*----------------------------------------------*/
+    //       Overlay (pantalla de carga)             */
+    /*----------------------------------------------*/
+    this.overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
+    this.overlayMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      vertexShader: overlayVertexShader,
+      fragmentShader: overlayFragmentShader,
+      uniforms: {
+        uAlpha: new THREE.Uniform(1),
+      },
+    });
+    this.overlay = new THREE.Mesh(this.overlayGeometry, this.overlayMaterial);
+    this.scene.add(this.overlay);
+
+    /*----------------------------------------------*/
+    //   Loading Bar + Manager                      */
+    /*----------------------------------------------*/
+    this.loadingBar = document.querySelector(".loading-bar");
+    this.sceneReady = false;
+
+    this.loadingManager = new THREE.LoadingManager(
+      // onLoad
+      () => {
+        window.setTimeout(() => {
+          gsap.to(this.overlayMaterial.uniforms.uAlpha, {
+            duration: 2,
+            value: 0,
+            delay: 0.5,
+            ease: "power2.out",
+            onComplete: () => {
+              this.scene.remove(this.overlay);
+              this.controls.enabled = true;
+              document
+                .querySelectorAll(".prev, .next")
+                .forEach((btn) => (btn.style.display = "block"));
+            },
+          });
+          this.loadingBar.classList.add("loaded");
+        }, 500);
+
+        window.setTimeout(() => {
+          this.sceneReady = true;
+        }, 2000);
+      },
+      // onProgress
+      (itemUrl, itemsLoaded, itemsTotal) => {
+        console.log(itemUrl, itemsLoaded, itemsTotal);
+        const progressRatio = itemsLoaded / itemsTotal;
+        this.loadingBar.style.transform = `scaleX(${progressRatio})`;
+      }
+    );
+    /*----------------------------------------------*/
     //   OrbitControl                              */
     /*----------------------------------------------*/
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;
+    this.controls.enabled = false; //
 
+    document
+      .querySelectorAll(".prev, .next")
+      .forEach((btn) => (btn.style.display = "none"));
     /*----------------------------------------------*/
     //   Load EXR                                   */
     /*----------------------------------------------*/
     this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     this.pmremGenerator.compileEquirectangularShader();
 
-    const exrLoader = new EXRLoader();
+    const exrLoader = new EXRLoader(this.loadingManager);
 
     exrLoader.load(
       "/environmentMap/NightSkyHDRI004_8K-HDR.exr",
@@ -57,6 +116,8 @@ export default class GLApp {
         environmentMap.mapping = THREE.EquirectangularReflectionMapping;
         this.scene.background = environmentMap;
         this.scene.environment = environmentMap;
+
+        this.checkIfReady();
       }
     );
 
@@ -106,5 +167,17 @@ export default class GLApp {
       that.controls.update();
     }
     animate();
+  }
+  checkIfReady() {
+    if (this.models?.is_ready && this.scene.environment) {
+      gsap.to(this.overlayMaterial.uniforms.uAlpha, {
+        value: 0,
+        duration: 1.5,
+        ease: "power2.out",
+        onComplete: () => {
+          this.scene.remove(this.overlay);
+        },
+      });
+    }
   }
 }

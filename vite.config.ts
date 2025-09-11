@@ -1,4 +1,6 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
+import glsl from "vite-plugin-glsl";
 export default defineConfig({
-    assetsInclude: ['**/*.glb'],
+  plugins: [glsl()],
+  assetsInclude: ["**/*.glb"],
 });

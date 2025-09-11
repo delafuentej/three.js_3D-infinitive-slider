@@ -30,13 +30,50 @@ button {
 }
 
 canvas#sketch {
-  position: fixed;
+  position: relative;
   left: 0;
   top: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
   background: #1d1d1d;
+}
+
+.loading-bar {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 10px; /* Aumentamos el grosor para mayor impacto */
+  background: linear-gradient(
+    90deg,
+    #ff00ff,
+    #00ffff
+  ); /* Efecto de degradado */
+  border-radius: 5px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+  animation: pulseGlow 1.5s infinite alternate;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.9);
+  }
+}
+
+.loading-bar.loaded {
+  transform-origin: 100% 0;
+  transition: transform 1.5s ease-in-out;
+  display: none;
 }
 
 .list-imgs {
