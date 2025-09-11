@@ -113,6 +113,14 @@ export default class GLApp {
 
     const exrLoader = new EXRLoader(this.loadingManager);
 
+    fetch(exrPath)
+      .then((res) => res.arrayBuffer())
+      .then((buffer) => exrLoader.parse(buffer))
+      .then((envMap) => {
+        envMap.mapping = THREE.EquirectangularReflectionMapping;
+        scene.background = envMap;
+        scene.environment = envMap;
+      });
     exrLoader.load(exrPath, (environmentMap) => {
       environmentMap.mapping = THREE.EquirectangularReflectionMapping;
       this.scene.background = environmentMap;
