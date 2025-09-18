@@ -166,10 +166,10 @@ export default class Models {
   //? - =========================  UPDATES  ========================= -//
   //? - =========================  UPDATES  ========================= -//
   update() {
-    // if (this.is_ready) {
-    //   this.group.children.forEach((model, index) => {
-    //     model.rotation.y += 0.01;
-    //   });
-    // }
+    if (this.is_ready) {
+      this.group.children.forEach((model, index) => {
+        model.rotation.y += 0.01;
+      });
+    }
   }
 }
