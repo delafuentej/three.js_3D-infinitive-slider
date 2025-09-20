@@ -49,14 +49,19 @@ export default class GLApp {
     this.overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
     this.overlayMaterial = new THREE.ShaderMaterial({
       transparent: true,
+      // depthTest: false, // importante: no testea profundidad
+      // depthWrite: false, // importante: no escriba en el depth buffer
       vertexShader: overlayVertexShader,
       fragmentShader: overlayFragmentShader,
       uniforms: {
-        uAlpha: new THREE.Uniform(1),
+        uAlpha: { value: 1.0 },
       },
     });
     this.overlay = new THREE.Mesh(this.overlayGeometry, this.overlayMaterial);
+    this.overlay.renderOrder = 9999;
     this.scene.add(this.overlay);
+
+    // console.log("overlay alpha:", this.overlayMaterial.uniforms.uAlpha.value);
 
     // -------------------------
     // Loading Bar + Manager
@@ -69,7 +74,6 @@ export default class GLApp {
         window.setTimeout(() => {
           gsap.to(this.overlayMaterial.uniforms.uAlpha, {
             duration: 2,
-            value: 0,
             delay: 0.5,
             ease: "power2.out",
             onComplete: () => {
@@ -79,6 +83,7 @@ export default class GLApp {
                 .querySelectorAll(".prev, .next")
                 .forEach((btn) => (btn.style.display = "block"));
             },
+            onUpdate: () => (this.overlayMaterial.needsUpdate = true),
           });
           this.loadingBar.classList.add("loaded");
         }, 500);
@@ -133,6 +138,7 @@ export default class GLApp {
     // -------------------------
     // Models
     // -------------------------
+
     this.models = new Models(this);
 
     // -------------------------
@@ -146,6 +152,7 @@ export default class GLApp {
       // Animación de modelos
       if (this.models.is_ready) {
         this.models.meshes.forEach((mesh, i) => {
+          //  console.log("meshes", this.models.meshes);
           mesh.position.y += Math.sin(elapsed + i) * 0.001;
           mesh.rotation.x = Math.sin(elapsed + i) * 0.1;
           mesh.rotation.y = Math.cos(elapsed + i) * 0.1;
@@ -160,14 +167,44 @@ export default class GLApp {
     animate();
   }
 
+  // checkIfReady() {
+  // if (this.models?.is_ready && this.scene.environment) {
+  // gsap.to(this.overlayMaterial.uniforms.uAlpha, {
+  // value: 0,
+  // duration: 0.5,
+  // ease: "power2.out",
+  // onComplete: () => {
+  // this.scene.remove(this.overlay);
+  // },
+  // });
+  // }
+  // }
   checkIfReady() {
+    console.log(
+      "checkIfReady:",
+      this.models?.is_ready,
+      !!this.scene.environment
+    );
     if (this.models?.is_ready && this.scene.environment) {
-      gsap.to(this.overlayMaterial.uniforms.uAlpha, {
-        value: 0,
-        duration: 0.5,
+      const u = this.overlayMaterial.uniforms.uAlpha;
+      const proxy = { alpha: u.value }; // proxy para GSAP
+
+      gsap.to(proxy, {
+        alpha: 0,
+        duration: 1.5,
         ease: "power2.out",
+        onUpdate: () => {
+          u.value = proxy.alpha; // vuelca alpha al uniform
+        },
         onComplete: () => {
-          this.scene.remove(this.overlay);
+          // asegúrate de liberar y quitar el overlay
+          if (this.overlay.parent) this.scene.remove(this.overlay);
+          this.overlayGeometry.dispose();
+          this.overlayMaterial.dispose();
+          this.controls.enabled = true;
+          document
+            .querySelectorAll(".prev, .next")
+            .forEach((btn) => (btn.style.display = "block"));
         },
       });
     }

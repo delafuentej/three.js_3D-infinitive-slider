@@ -149,15 +149,17 @@ export default class Models {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader(this.gl_app.loadingManager);
       loader.load(src, (texture) => {
+        // console.log("src", src);
         texture.colorSpace = THREE.SRGBColorSpace;
         this.textures.push(texture);
-        console.log("texture", texture);
-
+        // console.log("texture-loadTexture", texture);
+        //
         if (this.textures.length === this.imgs.length) {
           this.is_ready = true;
           this.createMeshes();
           this.gl_app.checkIfReady();
         }
+
         resolve(texture);
       });
     });

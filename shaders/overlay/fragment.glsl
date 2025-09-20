@@ -1,5 +1,6 @@
 uniform float uAlpha;
 
 void main(){
-    gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+    vec4 col =vec4(0.0, 0.0, 0.0, uAlpha);
+    gl_FragColor = col;
 }
