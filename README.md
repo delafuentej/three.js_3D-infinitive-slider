@@ -7,14 +7,13 @@ A WebGL project built with **Three.js**, **GSAP**, and custom **GLSL shaders**, 
 - A **loading bar with progress tracking**
 - **OrbitControls** for smooth camera interaction
 - HDRI **environment lighting**
-- Custom **image textures** dynamically arranged in 3D space
-
- - This project is inspired by Victor Costa’s course on creative WebGL/Three.js experiences.
+- Custom **image textures** dynamically arranged in 3D space.
+- This project is inspired by Victor Costa’s course on creative WebGL/Three.js experiences.
 - I adapted and extended the concepts to build a custom 3D Infinite Slider with Overlay-Shaders & Dinamic Image Generation.
 
 ---
 
-images = fuente pixalbay.com y canva.com
+![Preview](/public/images/project-img.png)
 
 ## 🚀 Features
 
@@ -46,6 +45,11 @@ images = fuente pixalbay.com y canva.com
 - GLSL Shaders — custom vertex & fragment for overlay effects
 
 ---
+
+## Images / Visual Assets
+
+All images used in this project were sourced from [Pixabay](https://pixabay.com/) and [Canva](https://www.canva.com/).
+
 ## 🚀 Getting Started
 
 Follow these steps to set up the project locally:
