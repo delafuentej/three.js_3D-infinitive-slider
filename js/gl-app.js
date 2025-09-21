@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+
 import gsap from "gsap";
 
 import overlayVertexShader from "/shaders/overlay/vertex.glsl";
@@ -49,8 +50,8 @@ export default class GLApp {
     this.overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
     this.overlayMaterial = new THREE.ShaderMaterial({
       transparent: true,
-      // depthTest: false, // importante: no testea profundidad
-      // depthWrite: false, // importante: no escriba en el depth buffer
+      depthTest: false, // importante: no testea profundidad
+      depthWrite: false, // importante: no escriba en el depth buffer
       vertexShader: overlayVertexShader,
       fragmentShader: overlayFragmentShader,
       uniforms: {

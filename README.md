@@ -13,6 +13,8 @@ A WebGL project built with **Three.js**, **GSAP**, and custom **GLSL shaders**, 
 
 ---
 
+🔗 [Live-Demo ](https://three-js-3-d-infinitive-slider.vercel.app/)
+
 ![Preview](/public/images/project-img.png)
 
 ## 🚀 Features
